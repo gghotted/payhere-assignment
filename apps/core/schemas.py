@@ -6,3 +6,10 @@ create_response_schema = Schema(
         'created_at': str,
     }
 )
+
+token_schema = Schema(
+    {
+        'access': str,
+        'refresh': str,
+    }
+)
