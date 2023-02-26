@@ -1,4 +1,4 @@
-from account_books.models import AccountBook
+from account_books.models import AccountBook, Transaction
 from django.core.management import call_command
 from django.test import TestCase
 from users.models import User
@@ -32,10 +32,22 @@ class FixtureGenerateBase(TestCase):
 
         '''
         user1은 1개의 AccountBook을 가집니다.
+        이 AccountBook는 15개의 transaction을 가집니다.
         '''
-        AccountBook.objects.create(
+        account_book = AccountBook.objects.create(
             user=user1,
             name='name',
         )
+        transactions = [
+            Transaction(
+                account_book=account_book,
+                description='description',
+                occurred_at='2023-01-01',
+                amount=5000,
+                type=('+' if i < 7 else '-'),
+            )
+            for i in range(15)
+        ]
+        Transaction.objects.bulk_create(transactions)
 
         dumpdata('base')
