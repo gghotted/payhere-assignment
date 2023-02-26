@@ -40,6 +40,7 @@ account_book_schema = Schema(
         'created_at': str,
         'updated_at': str,
         'name': str,
+        'total_amount': int,
     }
 )
 

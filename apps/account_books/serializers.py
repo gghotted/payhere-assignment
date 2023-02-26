@@ -18,6 +18,7 @@ class AccountBookCreateSerializer(CreateSerializer):
 
 
 class AccountBookSerializer(serializers.ModelSerializer):
+    total_amount = serializers.SerializerMethodField()
 
     class Meta:
         model = AccountBook
@@ -26,7 +27,11 @@ class AccountBookSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
             'name',
+            'total_amount',
         )
+
+    def get_total_amount(self, obj):
+        return obj.total_amount
 
 
 class AccountBookUpdateSerializer(UpdateSerializer):

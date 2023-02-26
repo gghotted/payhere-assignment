@@ -3,6 +3,8 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinLengthValidator, MinValueValidator
 from django.db import models
 
+from account_books.managers import AccountBookManager
+
 
 class AccountBook(BaseModel):
     user = models.ForeignKey(
@@ -18,6 +20,8 @@ class AccountBook(BaseModel):
             MinLengthValidator(3),
         ]
     )
+
+    objects = AccountBookManager()
 
 
 class Transaction(BaseModel):
