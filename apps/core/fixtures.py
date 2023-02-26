@@ -1,3 +1,4 @@
+from account_books.models import AccountBook
 from django.core.management import call_command
 from django.test import TestCase
 from users.models import User
@@ -27,6 +28,14 @@ class FixtureGenerateBase(TestCase):
         user2 = User.objects.create_user(
             'user2@google.com',
             USER_PASSWORD,
+        )
+
+        '''
+        user1은 1개의 AccountBook을 가집니다.
+        '''
+        AccountBook.objects.create(
+            user=user1,
+            name='name',
         )
 
         dumpdata('base')

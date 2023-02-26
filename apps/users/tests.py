@@ -1,3 +1,4 @@
+from core.fixtures import USER_PASSWORD
 from core.schemas import *
 from django.test import TestCase
 from django.urls import reverse_lazy
@@ -19,11 +20,15 @@ def create_token(user):
     serializer = TokenObtainPairSerializer(
         data={
             'email': user.email,
-            'password': user._password,
+            'password': USER_PASSWORD,
         }
     )
     serializer.is_valid(raise_exception=True)
     return serializer.validated_data
+
+
+def auth_header(token):
+    return {'HTTP_AUTHORIZATION': f'Bearer {token["access"]}'} 
 
 
 class UserCreateAPITestCase(TestCase):

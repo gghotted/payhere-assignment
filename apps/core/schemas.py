@@ -13,3 +13,12 @@ token_schema = Schema(
         'refresh': str,
     }
 )
+
+account_book_schema = Schema(
+    {
+        'id': int,
+        'created_at': str,
+        'updated_at': str,
+        'name': str,
+    }
+)
