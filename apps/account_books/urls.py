@@ -3,7 +3,8 @@ from django.urls import path
 from account_books.views import (AccountRetrieveUpdateDestroyAPIView,
                                  TransactionCopyAPIView,
                                  TransactionListCreateAPIView,
-                                 TransactionRetrieveUpdateDestroyAPIView)
+                                 TransactionRetrieveUpdateDestroyAPIView,
+                                 TransactionShareAPITestCase)
 
 app_name = 'account_books'
 
@@ -17,4 +18,7 @@ urlpatterns = [
     path('<int:book_id>/transactions/<int:transaction_id>/copy/',
                                         TransactionCopyAPIView.as_view(),
                                         name='copy_transaction'),
+    path('<int:book_id>/transactions/<int:transaction_id>/share-links/',
+                                        TransactionShareAPITestCase.as_view(),
+                                        name='share_transaction'),
 ]

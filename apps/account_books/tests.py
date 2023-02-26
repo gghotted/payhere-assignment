@@ -1,8 +1,12 @@
+from datetime import timedelta
+
 from core.schemas import *
 from django.db.models.aggregates import Count
 from django.forms.models import model_to_dict
 from django.test import TestCase
 from django.urls import reverse, reverse_lazy
+from django.utils.timezone import now
+from freezegun import freeze_time
 from schema import Schema
 from users.models import User
 from users.tests import auth_header, create_token
@@ -296,6 +300,35 @@ class TransactionDetailAPITestCase(TestCase):
         res = self.client.get(self.path, **header)
         self.assertEqual(403, res.status_code)
 
+    def _create_guest_code(self):
+        res = self.client.post(
+            self.path + 'share-links/',
+            **self.header,
+        )
+        url = res.json()['url']
+        guest_code = url.split('/')[-1]
+        return guest_code
+
+    def test_success_guest(self):
+        guest_code = self._create_guest_code()
+
+        res = self.client.get(self.path + '?guest=%s' % guest_code)
+        self.assertEqual(200, res.status_code)
+
+    def test_expired_guest(self):
+        time = now()
+        with freeze_time(time):
+            guest_code = self._create_guest_code()
+
+        with freeze_time(time + timedelta(days=1, seconds=1)):
+            res = self.client.get(self.path + '?guest=%s' % guest_code)
+
+        self.assertEqual(401, res.status_code)
+
+    def test_wrong_guest_code(self):
+        res = self.client.get(self.path + '?guest=abcd')
+        self.assertEqual(401, res.status_code)
+
 
 class TransactionUpdateAPITestCase(TestCase):
     fixtures = ['base']
@@ -349,6 +382,17 @@ class TransactionUpdateAPITestCase(TestCase):
         res = self.client.patch(self.path, **header)
         self.assertEqual(403, res.status_code)
 
+    def test_not_allowed_method_guest(self):
+        res = self.client.post(
+            self.path + 'share-links/',
+            **self.header,
+        )
+        url = res.json()['url']
+        guest_code = url.split('/')[-1]
+
+        res = self.client.patch(self.path + '?guest=%s' % guest_code)
+        self.assertEqual(401, res.status_code)
+
 
 class TransactionDeleteAPITestCase(TestCase):
     fixtures = ['base']
@@ -382,6 +426,17 @@ class TransactionDeleteAPITestCase(TestCase):
 
         res = self.client.delete(self.path, **header)
         self.assertEqual(403, res.status_code)
+
+    def test_not_allowed_method_guest(self):
+        res = self.client.post(
+            self.path + 'share-links/',
+            **self.header,
+        )
+        url = res.json()['url']
+        guest_code = url.split('/')[-1]
+
+        res = self.client.delete(self.path + '?guest=%s' % guest_code)
+        self.assertEqual(401, res.status_code)
 
 
 class TransactionCopyAPITestCase(TestCase):
@@ -422,6 +477,46 @@ class TransactionCopyAPITestCase(TestCase):
             model_to_dict(copied_trans, fields=check_fields),
         )
         self.assertNotEqual(self.trans.id, copied_trans.id)
+
+    def test_no_auth(self):
+        res = self.client.post(self.path)
+        self.assertEqual(401, res.status_code)
+
+    def test_no_permission(self):
+        user = User.objects.exclude(id=self.user.id).first()
+        header = auth_header(create_token(user))
+
+        res = self.client.post(self.path, **header)
+        self.assertEqual(403, res.status_code)
+
+
+class TransactionShareAPITestCase(TestCase):
+    fixtures = ['base']
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.trans = Transaction.objects.first()
+        cls.user = cls.trans.account_book.user
+        cls.token = create_token(cls.user)
+        cls.header = auth_header(cls.token)
+
+        cls.path = reverse(
+            'account_books:share_transaction',
+            args=[
+                cls.trans.account_book.id,
+                cls.trans.id,
+            ]
+        )
+
+    def test_success(self):
+        res = self.client.post(self.path, **self.header)
+        self.assertEqual(200, res.status_code)
+
+        url = res.json()['url']
+        self.assertTrue(url.startswith('https://front.com/s/'))
+
+        guest_code = url.split('/')[-1]
+        self.assertEqual(12, len(guest_code))
 
     def test_no_auth(self):
         res = self.client.post(self.path)

@@ -1,3 +1,4 @@
+from datetime import timedelta
 from functools import cached_property, partial
 
 from core.paginations import pagination_factory
@@ -7,6 +8,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.generics import (ListCreateAPIView,
                                      RetrieveUpdateDestroyAPIView)
 from rest_framework.permissions import IsAuthenticated
+from share.permissions import IsGuest
+from share.views import ShareLinkCreateAPIView
 
 from account_books.models import AccountBook, Transaction
 from account_books.serializers import (AccountBookCreateSerializer,
@@ -73,10 +76,13 @@ class TransactionListCreateAPIView(ListCreateAPIView):
 class TransactionRetrieveUpdateDestroyAPIView(
     RetrieveUpdateDestroyAPIView
 ):
-    permission_classes = [
-        IsAuthenticated,
-        partial(EqualUser, attr_name='account_book.user'),
-    ]
+    user_permission = (
+        IsAuthenticated &
+        partial(EqualUser, attr_name='account_book.user')
+    )
+    guest_permission = partial(IsGuest, allowed_access_scope='view transaction {pk}')
+    permission_classes = [user_permission | guest_permission]
+    
     lookup_url_kwarg = 'transaction_id'
     queryset = Transaction.objects.all()
 
@@ -93,3 +99,17 @@ class TransactionCopyAPIView(CopyView):
     ]
     lookup_url_kwarg = 'transaction_id'
     queryset = Transaction.objects.all()
+
+
+class TransactionShareAPITestCase(ShareLinkCreateAPIView):
+    permission_classes = [
+        IsAuthenticated,
+        partial(EqualUser, attr_name='account_book.user'),
+    ]
+    lookup_url_kwarg = 'transaction_id'
+    queryset = Transaction.objects.all()
+
+    share_access_scope = 'view transaction {pk}'
+    share_link_host = 'https://front.com/'
+    share_link_prefix = 's'
+    share_life_time = timedelta(days=1)
