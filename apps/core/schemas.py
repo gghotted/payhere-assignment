@@ -19,10 +19,18 @@ create_response_schema = Schema(
     }
 )
 
+user_schema = Schema(
+    {
+        'id': int,
+        'email': str,
+    }
+)
+
 token_schema = Schema(
     {
         'access': str,
         'refresh': str,
+        'user': user_schema,
     }
 )
 
