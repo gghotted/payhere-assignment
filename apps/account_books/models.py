@@ -13,9 +13,8 @@ class AccountBook(BaseModel):
     )
     name = models.CharField(
         verbose_name='이름',
-        max_length=64,
+        max_length=20,
         validators=[
             MinLengthValidator(3),
-            MaxLengthValidator(20),
         ]
     )
