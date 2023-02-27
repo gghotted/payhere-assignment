@@ -101,7 +101,7 @@ class TransactionCopyAPIView(CopyView):
     queryset = Transaction.objects.all()
 
 
-class TransactionShareAPITestCase(ShareLinkCreateAPIView):
+class TransactionShareAPIView(ShareLinkCreateAPIView):
     permission_classes = [
         IsAuthenticated,
         partial(EqualUser, attr_name='account_book.user'),

@@ -4,7 +4,7 @@ from account_books.views import (AccountRetrieveUpdateDestroyAPIView,
                                  TransactionCopyAPIView,
                                  TransactionListCreateAPIView,
                                  TransactionRetrieveUpdateDestroyAPIView,
-                                 TransactionShareAPITestCase)
+                                 TransactionShareAPIView)
 
 app_name = 'account_books'
 
@@ -19,6 +19,6 @@ urlpatterns = [
                                         TransactionCopyAPIView.as_view(),
                                         name='copy_transaction'),
     path('<int:book_id>/transactions/<int:transaction_id>/share-links/',
-                                        TransactionShareAPITestCase.as_view(),
+                                        TransactionShareAPIView.as_view(),
                                         name='share_transaction'),
 ]
