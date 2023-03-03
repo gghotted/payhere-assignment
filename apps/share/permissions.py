@@ -1,10 +1,11 @@
+from core.permissions import CallbleMixin
 from django.utils.timezone import now
 from rest_framework.permissions import BasePermission
 
 from share.models import Guest
 
 
-class IsGuest(BasePermission):
+class IsGuest(CallbleMixin, BasePermission):
     allowed_methods = ['GET']
 
     def __init__(self, allowed_access_scope):

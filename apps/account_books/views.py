@@ -35,7 +35,7 @@ class AccountCreateListCreateAPIView(ListCreateAPIView):
 class AccountRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     permission_classes = [
         IsAuthenticated,
-        partial(EqualUser, attr_name='user'),
+        EqualUser('user'),
     ]
     queryset = AccountBook.objects.all()
     lookup_url_kwarg = 'book_id'
@@ -49,7 +49,7 @@ class AccountRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
 class TransactionListCreateAPIView(ListCreateAPIView):
     permission_classes = [
         IsAuthenticated,
-        partial(EqualUser, attr_name='user'),
+        EqualUser('user'),
     ]
     pagination_class = pagination_factory(page_size=10)
 
@@ -78,9 +78,9 @@ class TransactionRetrieveUpdateDestroyAPIView(
 ):
     user_permission = (
         IsAuthenticated &
-        partial(EqualUser, attr_name='account_book.user')
+        EqualUser('account_book.user')
     )
-    guest_permission = partial(IsGuest, allowed_access_scope='view transaction {pk}')
+    guest_permission = IsGuest('view transaction {pk}')
     permission_classes = [user_permission | guest_permission]
     
     lookup_url_kwarg = 'transaction_id'
@@ -95,7 +95,7 @@ class TransactionRetrieveUpdateDestroyAPIView(
 class TransactionCopyAPIView(CopyView):
     permission_classes = [
         IsAuthenticated,
-        partial(EqualUser, attr_name='account_book.user'),
+        EqualUser('account_book.user'),
     ]
     lookup_url_kwarg = 'transaction_id'
     queryset = Transaction.objects.all()
@@ -104,7 +104,7 @@ class TransactionCopyAPIView(CopyView):
 class TransactionShareAPIView(ShareLinkCreateAPIView):
     permission_classes = [
         IsAuthenticated,
-        partial(EqualUser, attr_name='account_book.user'),
+        EqualUser('account_book.user'),
     ]
     lookup_url_kwarg = 'transaction_id'
     queryset = Transaction.objects.all()

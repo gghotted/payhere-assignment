@@ -3,7 +3,13 @@ from operator import attrgetter
 from rest_framework.permissions import BasePermission
 
 
-class EqualUser(BasePermission):
+class CallbleMixin:
+    
+    def __call__(self):
+        return self
+
+
+class EqualUser(CallbleMixin, BasePermission):
 
     def __init__(self, attr_name):
         self.attr_name = attr_name
