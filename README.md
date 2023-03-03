@@ -9,7 +9,7 @@ Payment 백엔드 포지션 과제입니다
 
 ## API
 
-상세 스팩은 [swagger hub](https://app.swaggerhub.com/apis-docs/gghotted/payhere-assignment/1.0.0)에 정의하였습니다.
+상세 스팩은 [swagger hub](https://app.swaggerhub.com/apis-docs/gghotted/payhere-assignment/1.0.1)에 정의하였습니다.
 
 ### Endpoint 설계
 
