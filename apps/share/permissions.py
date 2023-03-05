@@ -20,7 +20,7 @@ class IsGuest(CallbleMixin, BasePermission):
         qs = Guest.objects.filter(
             expired_at__gt=now(),
             code=guest_code,
-            access_scope=self.allowed_access_scope
+            access_scope__contains=self.allowed_access_scope
         )
         return qs.exists()
         

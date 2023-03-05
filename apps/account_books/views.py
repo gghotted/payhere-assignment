@@ -33,10 +33,9 @@ class AccountCreateListCreateAPIView(ListCreateAPIView):
 
 
 class AccountRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [
-        IsAuthenticated,
-        EqualUser('user'),
-    ]
+    user_permission = IsAuthenticated & EqualUser('user')
+    guest_permission = IsGuest('view account_book {pk}')
+    permission_classes = [user_permission | guest_permission]
     queryset = AccountBook.objects.all()
     lookup_url_kwarg = 'book_id'
 
@@ -109,7 +108,10 @@ class TransactionShareAPIView(ShareLinkCreateAPIView):
     lookup_url_kwarg = 'transaction_id'
     queryset = Transaction.objects.all()
 
-    share_access_scope = 'view transaction {pk}'
+    share_access_scopes = [
+        'view transaction {object.pk}',
+        'view account_book {object.account_book.pk}',
+    ]
     share_object_pks = {
         'transaction': '{object.pk}',
         'account_book': '{object.account_book.pk}'

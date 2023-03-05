@@ -18,9 +18,9 @@ class CreateShareLinkMixin:
 
     '''
     access_scope를 설정하고, 이 값으로 api 접근을 제어합니다.
-    ex: "view user {pk}"
+    ex: ["view user {object.pk}"]
     '''
-    share_access_scope = ''
+    share_access_scopes = None
 
     '''
     link의 호스트를 지정합니다.
@@ -69,16 +69,15 @@ class CreateShareLinkMixin:
         )
 
     def get_access_scope(self):
-        if not self.share_access_scope:
+        if not self.share_access_scopes:
             raise NotImplementedError(
-                '"share_access_scope" must be set.'
+                '"share_access_scopes" must be set.'
             )
 
-        share_access_scope = self.share_access_scope
-        if '{pk}' in share_access_scope:
-            obj = self.get_object()
-            share_access_scope = share_access_scope.format(pk=obj.pk)
-        return share_access_scope
+        return ','.join([
+            self.convert_pk_format(access_scope)
+            for access_scope in self.share_access_scopes
+        ])
 
     def get_object_pks(self):
         if not self.share_object_pks:
