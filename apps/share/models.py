@@ -1,6 +1,7 @@
 from core.models import BaseModel
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils.timezone import now
 from django_extensions.db.fields import RandomCharField
 
 
@@ -23,3 +24,11 @@ class Guest(BaseModel):
     expired_at = models.DateTimeField(
         verbose_name='만료일',
     )
+    object_pks = models.JSONField(
+        verbose_name='객체 pks',
+        blank=True,
+    )
+
+    @property
+    def is_expired(self):
+        return self.expired_at < now() 
