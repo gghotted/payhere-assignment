@@ -110,6 +110,10 @@ class TransactionShareAPIView(ShareLinkCreateAPIView):
     queryset = Transaction.objects.all()
 
     share_access_scope = 'view transaction {pk}'
+    share_object_pks = {
+        'transaction': '{object.pk}',
+        'account_book': '{object.account_book.pk}'
+    }
     share_link_host = 'https://front.com/'
     share_link_prefix = 's'
     share_life_time = timedelta(days=1)

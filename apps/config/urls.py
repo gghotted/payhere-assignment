@@ -22,4 +22,5 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('auth/', include('users.auth_urls')),
     path('account-books/', include('account_books.urls')),
+    path('share/', include('share.urls')),
 ]
