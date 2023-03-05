@@ -55,3 +55,16 @@ transaction_schema = Schema(
         'occurred_at': str,
     }
 )
+
+guest_schema = Schema(
+    {
+        'code': str,
+        'created_at': str,
+        'updated_at': str,
+        'object_pks': {str: int},
+        'access_scope': str,
+        'expired_at': str,
+        'is_expired': bool,
+        'created_by': int,
+    }
+)

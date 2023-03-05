@@ -1,6 +1,8 @@
 from account_books.models import AccountBook, Transaction
+from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.test import TestCase
+from share.models import Guest
 from users.models import User
 
 USER_PASSWORD = 'password1234'
@@ -33,6 +35,7 @@ class FixtureGenerateBase(TestCase):
         '''
         user1은 1개의 AccountBook을 가집니다.
         이 AccountBook는 15개의 transaction을 가집니다.
+        이 transaction중 1개는 guest를 가집니다.
         '''
         account_book = AccountBook.objects.create(
             user=user1,
@@ -48,6 +51,15 @@ class FixtureGenerateBase(TestCase):
             )
             for i in range(15)
         ]
-        Transaction.objects.bulk_create(transactions)
-
+        transactions = Transaction.objects.bulk_create(transactions)
+        trans = transactions[0]
+        guest = Guest.objects.create(
+            created_by=trans.account_book.user,
+            access_scope='view transaction %d' % trans.id,
+            expired_at='2099-01-01',
+            object_pks={
+                'transaction': trans.id,
+                'account_book': trans.account_book.id,
+            },
+        )
         dumpdata('base')
