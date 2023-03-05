@@ -315,6 +315,13 @@ class TransactionDetailAPITestCase(TestCase):
         res = self.client.get(self.path + '?guest=%s' % guest_code)
         self.assertEqual(200, res.status_code)
 
+    def test_success_guest_access_account_book(self):
+        guest_code = self._create_guest_code()
+        path = reverse('account_books:detail', args=[self.trans.account_book.id])
+
+        res = self.client.get(path + '?guest=%s' % guest_code)
+        self.assertEqual(200, res.status_code)
+
     def test_expired_guest(self):
         time = now()
         with freeze_time(time):
